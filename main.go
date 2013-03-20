@@ -2,10 +2,18 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"sort"
 	"strings"
+)
+
+// program flags:
+var (
+	flagFile = flag.String("file", ".bindings", "Location of the bindings file.")
+	flagSep  = flag.String("separator", "|", "Separator between entries. Default is a pipe '|'.")
+	flagHelp = flag.Bool("help", false, "Shows help and exits.")
 )
 
 const (
@@ -188,19 +196,31 @@ func GetLinesFromFile(f string) ([]string, error) {
 	return lines, nil
 }
 
+func showUsage() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
+	os.Exit(1)
+}
+
 // Point d'entrance.
 func main() {
-	lines, err := GetLinesFromFile("C:/jndibinding/.bindings")
-	if err != nil {
-		fmt.Println(err)
+	flag.Parse()
+	flag.Usage = showUsage
+
+	if *flagHelp {
+		showUsage()
 		os.Exit(1)
 	}
 
-	sep := "|"
+	lines, err := GetLinesFromFile(*flagFile)
+	if err != nil {
+		fmt.Printf("Unable to read file: %s\n", err)
+		os.Exit(1)
+	}
 
 	defs := ParseLines(lines)
 	sort.Sort(defs)
 	for _, def := range defs {
-		fmt.Printf("%s%s%s%s%s%s%s\n", def.Name, sep, def.Queue(), sep, def.TargClient(), sep, def.CCSId())
+		fmt.Printf("%s%s%s%s%s%s%s\n", def.Name, *flagSep, def.Queue(), *flagSep, def.TargClient(), *flagSep, def.CCSId())
 	}
 }
