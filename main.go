@@ -197,15 +197,17 @@ func GetLinesFromFile(f string) ([]string, error) {
 }
 
 func showUsage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "This program displays .bindings file entries.\n")
+	fmt.Fprintf(os.Stderr, "For more information, check http://github.com/krpors/mqb/\n\n")
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n\n", os.Args[0])
 	flag.PrintDefaults()
 	os.Exit(1)
 }
 
 // Point d'entrance.
 func main() {
-	flag.Parse()
 	flag.Usage = showUsage
+	flag.Parse()
 
 	if *flagHelp {
 		showUsage()
@@ -214,7 +216,7 @@ func main() {
 
 	lines, err := GetLinesFromFile(*flagFile)
 	if err != nil {
-		fmt.Printf("Unable to read file: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to read file: %s\n", err)
 		os.Exit(1)
 	}
 
